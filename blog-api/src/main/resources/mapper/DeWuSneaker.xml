@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.naccl.mapper.DeWuSneakerMapper">
+
+    <resultMap id="comment" type="top.naccl.entity.DeWuSneaker">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="brandName" column="brand_name"/>
+        <result property="code" column="code"/>
+        <result property="imageUrl" column="image_url"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+
+    <!--插入得物商品    -->
+    <insert id="addDeWuSneakerGoods" parameterType="top.naccl.entity.DeWuSneaker">
+        insert into de_wu_sneaker(name,brand_name,code,image_url,create_time) values (#{name},#{brandName},#{code},#{imageUrl},#{createTime})
+    </insert>
+
+    <!--更新得物商品    -->
+    <update id="editDeWuSneakerGoods" parameterType="top.naccl.entity.DeWuSneaker">
+        update de_wu_sneaker set name=#{name},brand_name=#{brandName},code=#{code},image_url=#{imageUrl},create_time=#{createTime}
+        where id=#{id}
+    </update>
+
+    <!--删除得物商品    -->
+    <delete id="deleteDeWuSneakerGoods">
+        delete from de_wu_sneaker
+        where id = #{id}
+    </delete>
+
+    <!--查询全部商品    -->
+    <select id="getDeWuSneakerGoods" resultType="top.naccl.entity.DeWuSneaker">
+        select id, name, brand_name, code, image_url, create_time from de_wu_sneaker
+        <if test="code!=null and code!='' " >
+            where de_wu_sneaker.code=#{code}
+        </if>
+    </select>
+
+</mapper>

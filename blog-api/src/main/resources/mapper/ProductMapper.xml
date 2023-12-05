@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="top.naccl.mapper.ProductMapper">
+
+    <resultMap id="log" type="top.naccl.entity.Product">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="image" column="image"/>
+        <result property="description" column="description"/>
+        <result property="price" column="price"/>
+        <result property="recommend" column="recommend"/>
+        <result property="published" column="published"/>
+        <result property="productCategoryId" column="product_category_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <!--改变收藏商品的选中状态    -->
+    <update id="checkedProductCollect">
+        update user_product set checked=#{checked} where user_id=#{userId}
+        <if test="productId!=null">
+            and product_id=#{productId}
+        </if>
+    </update>
+    <!--修改商品    -->
+    <update id="updateProduct" parameterType="top.naccl.entity.Product">
+        update product
+        <set>
+            <if test="name!=null and name!=''">
+                name = #{name},
+            </if>
+            <if test="image!=null and image!=''">
+                image = #{image},
+            </if>
+            <if test="code!=null and code!=''">
+                code = #{code},
+            </if>
+            <if test="description!=null and description!=''">
+                description = #{description},
+            </if>
+            <if test="color!=null and color!=''">
+                color = #{color},
+            </if>
+            <if test="retail!=null and retail!=''">
+                retail = #{retail},
+            </if>
+            <if test="price!=null and price!= ''">
+                price = #{price},
+            </if>
+            <if test="imageUrl!=null and imageUrl!=''">
+                image = #{imageUrl},
+            </if>
+            <if test="recommend!=null">
+                recommend = #{recommend},
+            </if>
+            <if test="published!=null">
+                published = #{published},
+            </if>
+            <if test="productCategoryId!=null">
+                product_category_id = #{productCategoryId},
+            </if>
+            <if test="purchaseRestrictions!=null">
+                purchaseRestrictions = #{purchaseRestrictions},
+            </if>
+            <if test="createTime!=null">
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime!=null">
+                update_time = #{updateTime}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <!--是否上推荐    -->
+    <update id="changeRecommend">
+        update product set recommend=#{checked} where id=#{id}
+    </update>
+    <select id="getProductByProductCategoryId" resultType="top.naccl.entity.Product" parameterType="java.lang.Long">
+        select *
+        from product as p
+                 left join product_category pc on p.product_category_id = pc.id
+        where pc.id = #{id}
+    </select>
+
+    <select id="getProductsIsRecommend" resultType="top.naccl.entity.Product">
+        select *
+        from product
+        where product.recommend = true
+    </select>
+    <!--通过商品id获取商品详情    -->
+    <select id="getProductById" resultType="top.naccl.entity.Product" parameterType="java.lang.Long">
+        select *
+        from product
+        where product.id = #{id}
+    </select>
+
+    <!--取消收藏商品   -->
+    <delete id="deleteCollectProduct">
+        delete
+        from user_product
+        where user_id = #{userId}
+          and product_id = #{productId}
+    </delete>
+    <!--删除用户id下的所有checked=true收藏的商品   -->
+    <delete id="deleteAllProductCollectByUserId" parameterType="java.lang.Long">
+        delete
+        from user_product
+        where user_id = #{userId} and checked = true
+    </delete>
+    <!--删除商品    -->
+    <delete id="deleteProduct" parameterType="java.lang.Long">
+        delete
+        from product
+        where id = #{id}
+    </delete>
+
+    <!--收藏商品    -->
+    <insert id="addCollectProduct">
+        insert into user_product(user_id, product_id, create_time)
+        values (#{userId}, #{productId}, #{createTime})
+    </insert>
+    <!--添加商品    -->
+    <insert id="addProduct" parameterType="top.naccl.entity.Product">
+        insert into product(name, image, description,code, color,retail,price,imageUrl, recommend, published, purchaseRestrictions,product_category_id, create_time, update_time)
+        values (#{name}, #{image}, #{description},#{code}, #{color},#{retail},#{price}, #{imageUrl},#{recommend}, #{published}, #{purchaseRestrictions},#{productCategoryId}, #{createTime}, #{updateTime})
+    </insert>
+
+    <!--判断商品是否收藏    -->
+    <select id="isCollectProductByUserIdAndProductId" resultType="java.lang.Integer">
+        select count(user_product.id) as collect
+        from user_product
+        where user_id = #{userId}
+          and product_id = #{productId}
+    </select>
+    <!--查询用户收藏的商品    -->
+    <select id="getProductCollect" resultType="top.naccl.entity.Product" parameterType="java.lang.Long">
+        select *
+        from product
+                 left join user_product on product.id = user_product.product_id
+        where user_product.user_id = #{userId}
+    </select>
+    <!--获取商品分类的商品    -->
+    <select id="getAllProduct" resultType="top.naccl.entity.Product">
+        select *
+        from product where product_category_id = #{productCategoryId} <if test="name!=null and name!=''"> and name like concat('%',#{name},'%')</if>
+    </select>
+    <!--根据名称或者货号查询全部的商品    -->
+    <select id="getAllProductByCodeOrName" resultType="top.naccl.entity.Product" parameterType="java.lang.String">
+        select * from product as p where p.code like concat('%',#{query},'%') or p.name like concat('%',#{query},'%')
+    </select>
+
+</mapper>

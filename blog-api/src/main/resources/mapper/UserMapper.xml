@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.naccl.mapper.UserMapper">
+
+    <resultMap id="BaseResultMapper" type="top.naccl.entity.User">
+        <id column="id" property="id" />
+        <result column="username" property="username"/>
+        <result column="nickname" property="nickname" />
+        <result column="password" property="password"/>
+        <result column="email" property="email" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="role" property="role" />
+        <result column="user_flag" property="userFlag" />
+        <result column="flag_color" property="flagColor" />
+        <result column="fans" property="fans" />
+        <result column="follow" property="follow" />
+    </resultMap>
+      <!--注册用户-->
+    <insert id="registerUser" parameterType="top.naccl.entity.User">
+        insert into user(username,nickname,password,email,avatar,create_time,update_time,role,user_flag,flag_color,user_sign)
+        values(#{username},#{nickname},#{password},#{email},#{avatar},#{createTime},#{updateTime},#{role},#{userFlag},#{flagColor},#{userSign})
+    </insert>
+    <insert id="addFans" parameterType="top.naccl.entity.UserFans">
+        insert into user_fans(user_id,fans_id,create_time)
+        values(#{userId},#{fansId},#{createTime})
+    </insert>
+
+    <!--增加账户的粉丝和关注数量    -->
+    <update id="addFansByUserId" parameterType="java.lang.Long">
+        update user set fans=fans+1 where id = #{id}
+    </update>
+    <update id="addFollowByUserId" parameterType="java.lang.Long">
+        update user set follow=follow+1 where id = #{id}
+    </update>
+
+    <!--更新用户密码    -->
+    <update id="updateUserPassword" >
+        update user set password=#{password} where id=#{id}
+    </update>
+    <!--更新用户    -->
+    <update id="updateUser" parameterType="top.naccl.entity.User">
+        update user set username=#{username},
+                        nickname=#{nickname},
+                        email=#{email},
+                        avatar=#{avatar},
+                        update_time=#{updateTime},
+                        user_flag=#{userFlag},
+                        flag_color=#{flagColor},
+                        user_sign=#{userSign}
+                        where id=#{id}
+    </update>
+    <!--更新用户    -->
+    <update id="updateAdmin" parameterType="top.naccl.entity.User">
+        update user set username=#{username},
+                        password=#{password},
+                        nickname=#{nickname},
+                        email=#{email},
+                        avatar=#{avatar},
+                        update_time=#{updateTime},
+                        user_flag=#{userFlag},
+                        flag_color=#{flagColor},
+                        user_sign=#{userSign}
+        where id=#{id}
+    </update>
+    <!--减去博主的粉丝    -->
+    <update id="subtractFans" parameterType="java.lang.Long">
+        update user set fans = fans -1 where id =#{id}
+    </update>
+    <!--减去用户的关注    -->
+    <update id="subtractFollow" parameterType="java.lang.Long">
+        update user set follow = follow -1 where id =#{id}
+    </update>
+    <!--管理员更新用户    -->
+    <update id="updateUserByAdmin" parameterType="top.naccl.entity.User">
+        update user set username=#{username},
+                        nickname=#{nickname},
+                        email=#{email},
+                        avatar=#{avatar},
+                        update_time=#{updateTime},
+                        user_flag=#{userFlag},
+                        flag_color=#{flagColor},
+                        user_sign=#{userSign},
+                        role=#{role},
+                        password=#{password} where id=#{id}
+    </update>
+    <!--取消关注    -->
+    <delete id="cancelFollow">
+        delete from user_fans where user_id=#{bloggerId} and fans_id=#{userId}
+    </delete>
+    <!--删除用户   -->
+    <delete id="deleteUser" parameterType="java.lang.Long">
+        delete from user where id = #{id}
+    </delete>
+
+    <!--按用户名查询User-->
+    <select id="findByUsername" resultType="top.naccl.entity.User">
+        select * from user where username=#{username} limit 1
+    </select>
+
+    <!--按id查询User-->
+    <select id="findById" resultType="top.naccl.entity.User">
+        select * from user where id=#{id} limit 1
+    </select>
+
+    <!--根据UserId查询当前的密码    -->
+    <select id="getPasswordByUserId" parameterType="java.lang.Long" resultType="top.naccl.entity.User">
+        select user.password from user where id=#{id}
+    </select>
+    <select id="findByUsernameIsNull" resultType="java.lang.Integer">
+        select count(user.id) from user where username=#{username}
+    </select>
+    <select id="getUserByUserName" resultType="java.lang.Integer">
+        select count(user.id) from user where username=#{username}
+    </select>
+    <!--判断是否为粉丝，当前的登陆的账户需要反转    -->
+    <select id="getFansByUserIdAndBloggerId" resultType="java.lang.Integer">
+        select count(user_fans.id) as fans from user_fans where user_id=#{bloggerId} and fans_id=#{userId}
+    </select>
+    <!--查询所有用户    -->
+    <select id="getAllUser" resultType="top.naccl.entity.User">
+        select * from user
+        <where>
+            <if test="name != null  and name!= ''">
+                 username=#{name} or nickname=#{name}
+            </if>
+        </where>
+    </select>
+    <!--通过前戳标识拿到user    -->
+    <select id="getUserByUserFlag" parameterType="java.lang.String" resultType="top.naccl.entity.User">
+        select * from user where user_flag=#{userFlag}
+    </select>
+
+
+</mapper>
