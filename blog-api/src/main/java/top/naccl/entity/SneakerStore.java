@@ -22,5 +22,8 @@ public class SneakerStore {
     private String code;//商品货号
     private String imageUrl;// 商品链接
     private Double amount;//商品总数
+    private Double profit;//商品盈亏
+    private Double price;//库存成本
     private LocalDateTime createTime;//创建时间
+
 }
