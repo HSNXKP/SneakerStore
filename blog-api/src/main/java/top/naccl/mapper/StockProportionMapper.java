@@ -11,4 +11,9 @@ import java.util.List;
 public interface StockProportionMapper {
     List<StockProportion> getStockProportion();
 
+    int addStockProportion(StockProportion stockProportion);
+
+    int editStockProportion(StockProportion proportion);
+
+    StockProportion getStockProportionById(Long id);
 }

@@ -17,4 +17,5 @@ public class StockProportion {
     private Long id; //商品ID
     private String name;//名称
     private Long value;//金额
+    private String proportion;//比例
 }
